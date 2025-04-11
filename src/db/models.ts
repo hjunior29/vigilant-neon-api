@@ -9,6 +9,12 @@ const defaultModel = {
     deletedAt: p.timestamp(),
 }
 
+export const users = p.pgTable("users", {
+    ...defaultModel,
+    username: p.text(),
+    hashedPassword: p.text()
+});
+
 export const publishers = p.pgTable("publishers", {
     ...defaultModel,
     name: p.text(),

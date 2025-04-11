@@ -5,7 +5,6 @@ import type { Publisher, Subscriber, Topic } from "./models";
 import { eq } from "drizzle-orm";
 
 export async function createPubSub() {
-
     const publisher = await db
         .insert(publishers)
         .values({})

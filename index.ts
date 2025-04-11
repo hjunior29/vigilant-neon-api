@@ -1,4 +1,4 @@
-import { checkDB, migrateDB } from "$core/index";
+import { checkDB, migrateDB, seed } from "$core/index";
 import { httpServer } from "server/http";
 import { wsServer } from "server/websocket";
 
@@ -17,6 +17,8 @@ async function bootstrap() {
             console.error("❌ Migrations failed. Exiting...");
             process.exit(1);
         }
+
+        seed();
 
         httpServer();
         wsServer();

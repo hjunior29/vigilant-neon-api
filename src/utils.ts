@@ -18,3 +18,16 @@ export function createResponse(status: number, message?: string, data?: any) {
         }
     );
 }
+
+export async function hashPassword(password: string): Promise<string> {
+    const hash = await Bun.password.hash(password, {
+        algorithm: "bcrypt",
+        cost: 4,
+    });
+    return hash;
+}
+
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+    const isMatch = await Bun.password.verify(password, hash);
+    return isMatch;
+}

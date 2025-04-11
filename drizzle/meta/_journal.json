@@ -8,6 +8,20 @@
       "when": 1744350683025,
       "tag": "0000_lonely_xorn",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1744409161743,
+      "tag": "0001_normal_agent_zero",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1744410710930,
+      "tag": "0002_familiar_clea",
+      "breakpoints": true
     }
   ]
 }
