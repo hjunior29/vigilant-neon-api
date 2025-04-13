@@ -1,5 +1,5 @@
 import { auth } from "auth";
-import { createPubSub } from "pubsub";
+import { createPubSub, getTopicById, getTopics } from "pubsub";
 import { createResponse } from "utils";
 
 export function httpServer() {
@@ -25,8 +25,16 @@ const login = {
 
 const pubsub = {
     "/api/pubsub": {
-        POST: async (req: Request) =>
-            createPubSub(req)
+        POST: (req: Request) =>
+            createPubSub(req),
+
+        GET: (req: Request) =>
+            getTopics(req)
+    },
+
+    "/api/pubsub/:id": {
+        GET: (req: Request) =>
+            getTopicById(req)
     }
 }
 

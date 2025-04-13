@@ -2,7 +2,7 @@ import { db } from "$core/index";
 import { publishers, subscribers, topics } from "$core/models";
 import { createResponse, verifyToken } from "utils";
 import type { Topic } from "./models";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 export async function createPubSub(req: Request) {
     const tokenResponse = await verifyToken(req.headers.get("Authorization"));
@@ -40,4 +40,47 @@ export async function saveTopic(topic: Topic) {
         .returning();
 
     return result ? result[0] : null;
+}
+
+export async function getTopics(req: Request) {
+    const tokenResponse = await verifyToken(req.headers.get("Authorization"));
+    if (tokenResponse instanceof Response) {
+        return tokenResponse;
+    }
+
+    const result = await db
+        .select()
+        .from(topics)
+        .where(
+            and(
+                isNull(topics.deletedAt),
+            )
+        );
+
+    return createResponse(200, "Topics retrieved", result);
+}
+
+export async function getTopicById(req: Request) {
+    const tokenResponse = await verifyToken(req.headers.get("Authorization"));
+    if (tokenResponse instanceof Response) {
+        return tokenResponse;
+    }
+
+    const url = new URL(req.url);
+    const pathParts = url.pathname.split("/");
+    const id = pathParts[pathParts.length - 1];
+
+    if (!id) return createResponse(400, "Missing id");
+
+    const result = await db
+        .select()
+        .from(topics)
+        .where(
+            and(
+                eq(topics.id, id),
+                isNull(topics.deletedAt),
+            )
+        );
+
+    return createResponse(200, "Topic retrieved", result);
 }
