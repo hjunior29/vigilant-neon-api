@@ -1,10 +1,15 @@
 import { db } from "$core/index";
 import { publishers, subscribers, topics } from "$core/models";
-import { createResponse } from "utils";
-import type { Publisher, Subscriber, Topic } from "./models";
+import { createResponse, verifyToken } from "utils";
+import type { Topic } from "./models";
 import { eq } from "drizzle-orm";
 
-export async function createPubSub() {
+export async function createPubSub(req: Request) {
+    const tokenResponse = await verifyToken(req.headers.get("Authorization"));
+    if (tokenResponse instanceof Response) {
+        return tokenResponse;
+    }
+
     const publisher = await db
         .insert(publishers)
         .values({})

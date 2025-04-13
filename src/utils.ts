@@ -1,4 +1,5 @@
-import { ORIGIN_URL } from "./constants";
+import { jwtVerify } from "jose";
+import { ORIGIN_URL, PUBLIC_KEY } from "./constants";
 
 export function createResponse(status: number, message?: string, data?: any) {
     return new Response(
@@ -30,4 +31,26 @@ export async function hashPassword(password: string): Promise<string> {
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
     const isMatch = await Bun.password.verify(password, hash);
     return isMatch;
+}
+
+export async function verifyToken(token: string | null) {
+    if (!token) {
+        return createResponse(401, "Unauthorized");
+    }
+
+    if (token.startsWith("Bearer ")) {
+        token = token.slice(7);
+        if (!token) {
+            return createResponse(401, "Unauthorized");
+        }
+    }
+
+    try {
+        await jwtVerify(token, PUBLIC_KEY, {
+            algorithms: ["RS256"]
+        });
+        return
+    } catch {
+        return createResponse(401, "Invalid token");
+    }
 }

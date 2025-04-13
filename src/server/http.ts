@@ -25,8 +25,8 @@ const login = {
 
 const pubsub = {
     "/api/pubsub": {
-        POST: async () =>
-            createPubSub()
+        POST: async (req: Request) =>
+            createPubSub(req)
     }
 }
 

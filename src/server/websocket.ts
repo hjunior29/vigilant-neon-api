@@ -1,17 +1,23 @@
 import type { Topic } from "pubsub/models";
 import { saveTopic } from "pubsub";
+import { createResponse, verifyToken } from "utils";
 
 export function wsServer() {
     const server = Bun.serve<{ topicId: string; publisherId: string; subscriberId: string; messages: string[] }, {}>({
         port: Number(process.env.WS_PORT || 3001),
 
-        fetch(req, server) {
+        async fetch(req, server) {
+            const tokenResponse = await verifyToken(req.headers.get("Authorization"));
+            if (tokenResponse instanceof Response) {
+                return tokenResponse;
+            }
+
             const url = new URL(req.url);
             const topicId = url.searchParams.get("topicId");
 
-            if (req.method !== "GET") return new Response("Method Not Allowed", { status: 405 });
-            if (url.pathname !== "/") return new Response("Not Found", { status: 404 });
-            if (!topicId) return new Response("Bad Request: topicId missing", { status: 400 });
+            if (req.method !== "GET") return createResponse(405, "Method not allowed");
+            if (url.pathname !== "/") return createResponse(404, "Not found");
+            if (!topicId) return createResponse(400, "Missing topicId");
 
             const success = server.upgrade(req, {
                 data: {
@@ -20,7 +26,7 @@ export function wsServer() {
                 },
             });
 
-            if (success) return new Response("Switching Protocols", { status: 101 });
+            if (success) return createResponse(101, "Switching protocols");
 
             return undefined;
         },
