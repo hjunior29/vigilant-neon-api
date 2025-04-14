@@ -17,7 +17,7 @@ export function httpServer() {
 }
 
 const login = {
-    "/api/login": {
+    "/api/auth/login": {
         POST: async (req: Request) =>
             auth(req)
     }
