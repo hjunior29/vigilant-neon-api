@@ -30,4 +30,5 @@ export const topics = p.pgTable("topics", {
     publisherId: p.text(),
     subscriberId: p.text(),
     content: p.jsonb(),
+    sharedId: p.text(),
 });

@@ -22,6 +22,13 @@
       "when": 1744410710930,
       "tag": "0002_familiar_clea",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1745078754044,
+      "tag": "0003_long_phalanx",
+      "breakpoints": true
     }
   ]
 }

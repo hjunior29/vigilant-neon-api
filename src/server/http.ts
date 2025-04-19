@@ -1,5 +1,5 @@
 import { auth } from "auth";
-import { createPubSub, deleteTopics, getTopicById, getTopics } from "pubsub";
+import { createPubSub, deleteTopics, getSharedTopic, getTopicById, getTopics, shareTopic } from "pubsub";
 import { createResponse } from "utils";
 
 export function httpServer() {
@@ -38,6 +38,16 @@ const pubsub = {
     "/api/pubsub/:id": {
         GET: (req: Request) =>
             getTopicById(req)
+    },
+
+    "/api/pubsub/:id/share": {
+        GET: (req: Request) =>
+            shareTopic(req)
+    },
+
+    "/api/pubsub/shared/:sharedId": {
+        GET: (req: Request) =>
+            getSharedTopic(req)
     }
 }
 
