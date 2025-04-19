@@ -29,6 +29,13 @@
       "when": 1745078754044,
       "tag": "0003_long_phalanx",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1745087336583,
+      "tag": "0004_outstanding_magus",
+      "breakpoints": true
     }
   ]
 }

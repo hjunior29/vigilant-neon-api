@@ -2,7 +2,7 @@ import { db } from "$core/index";
 import { publishers, subscribers, topics } from "$core/models";
 import { createResponse, generateRandomString, verifyToken } from "utils";
 import type { Topic } from "./models";
-import { and, eq, isNull, inArray } from "drizzle-orm";
+import { and, eq, isNull, inArray, sql } from "drizzle-orm";
 
 export async function createPubSub(req: Request) {
     const tokenResponse = await verifyToken(req.headers.get("Authorization"));
@@ -40,6 +40,19 @@ export async function saveTopic(topic: Topic) {
         .returning();
 
     return result ? result[0] : null;
+}
+
+export async function appendMessage(topicId: string, msg: string | object) {
+    await db.execute(sql`
+        UPDATE topics
+        SET content = jsonb_set(
+            coalesce(content, '{}'::jsonb),
+            '{messages}',
+            coalesce(content->'messages', '[]'::jsonb)
+                 || ${JSON.stringify(msg)}::jsonb
+        )
+        WHERE id = ${topicId};
+    `);
 }
 
 export async function getTopics(req: Request) {
