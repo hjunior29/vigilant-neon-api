@@ -1,5 +1,5 @@
 import { auth } from "auth";
-import { createPubSub, getTopicById, getTopics } from "pubsub";
+import { createPubSub, deleteTopics, getTopicById, getTopics } from "pubsub";
 import { createResponse } from "utils";
 
 export function httpServer() {
@@ -29,7 +29,10 @@ const pubsub = {
             createPubSub(req),
 
         GET: (req: Request) =>
-            getTopics(req)
+            getTopics(req),
+
+        DELETE: (req: Request) =>
+            deleteTopics(req)
     },
 
     "/api/pubsub/:id": {

@@ -2,7 +2,7 @@ import { db } from "$core/index";
 import { publishers, subscribers, topics } from "$core/models";
 import { createResponse, verifyToken } from "utils";
 import type { Topic } from "./models";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, inArray } from "drizzle-orm";
 
 export async function createPubSub(req: Request) {
     const tokenResponse = await verifyToken(req.headers.get("Authorization"));
@@ -83,4 +83,30 @@ export async function getTopicById(req: Request) {
         );
 
     return createResponse(200, "Topic retrieved", result);
+}
+
+export async function deleteTopics(req: Request) {
+    const tokenResponse = await verifyToken(req.headers.get("Authorization"));
+    if (tokenResponse instanceof Response) {
+        return tokenResponse;
+    }
+
+    const body = await req.json();
+    const ids = body.ids;
+
+    if (!ids || !Array.isArray(ids)) return createResponse(400, "Invalid ids");
+    if (ids.length === 0) return createResponse(400, "No ids provided");
+
+    await db
+        .update(topics)
+        .set({ deletedAt: new Date() })
+        .where(
+            and(
+                isNull(topics.deletedAt),
+                inArray(topics.id, ids)
+            )
+        )
+        .returning();
+
+    return createResponse(200, "Topics deleted", null);
 }
