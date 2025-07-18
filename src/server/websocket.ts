@@ -1,6 +1,4 @@
-// src/wsServer.ts ------------------------------------------------------------
-import { appendMessage } from "pubsub";
-import { createResponse, verifyToken } from "utils";
+import { createResponse, verifyToken, appendMessage } from "utils";
 
 export function wsServer() {
     const server = Bun.serve<{ topicId: string }, {}>({

@@ -18,8 +18,7 @@ async function bootstrap() {
             process.exit(1);
         }
 
-        seed();
-
+        await seed();
         httpServer();
         wsServer();
     } catch (error) {

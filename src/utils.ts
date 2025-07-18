@@ -1,7 +1,28 @@
 import { jwtVerify } from "jose";
 import { ORIGIN_URL, PUBLIC_KEY } from "./constants";
+import {db} from "$core/index.ts";
+import {sql} from "drizzle-orm";
 
 export function createResponse(status: number, message?: string, data?: any) {
+    return new Response(
+        JSON.stringify({
+            status,
+            ...(message ? { message } : null),
+            ...(data ? { data } : null),
+        }),
+        {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": ORIGIN_URL ?? "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            },
+            status,
+        }
+    );
+}
+
+export function response(status: number, message?: string, data?: any) {
     return new Response(
         JSON.stringify({
             status,
@@ -63,4 +84,17 @@ export function generateRandomString(length: number): string {
         result += characters.charAt(randomIndex);
     }
     return result;
+}
+
+export async function appendMessage(topicId: string, msg: string | object) {
+    await db.execute(sql`
+        UPDATE topics
+        SET content = jsonb_set(
+            coalesce(content, '{}'::jsonb),
+            '{messages}',
+            coalesce(content->'messages', '[]'::jsonb)
+                 || ${JSON.stringify(msg)}::jsonb
+        )
+        WHERE id = ${topicId};
+    `);
 }
