@@ -1,6 +1,7 @@
 import { checkDB, migrateDB, seed } from "$core/index";
 import { httpServer } from "server/http";
-import { wsServer } from "server/websocket";
+import {websocketServer, wsServer} from "server/websocket";
+import {channelWsServer} from "./src/server/channel.ts";
 
 async function bootstrap() {
     console.log("🚀 Starting application...");
@@ -20,7 +21,7 @@ async function bootstrap() {
 
         await seed();
         httpServer();
-        wsServer();
+        websocketServer();
     } catch (error) {
         console.error("❌ Critical error during startup:", error);
         process.exit(1);

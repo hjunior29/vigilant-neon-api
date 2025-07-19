@@ -3,6 +3,13 @@ import { ORIGIN_URL, PUBLIC_KEY } from "./constants";
 import {db} from "$core/index.ts";
 import {sql} from "drizzle-orm";
 
+export const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": ORIGIN_URL ?? "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+}
+
 export function createResponse(status: number, message?: string, data?: any) {
     return new Response(
         JSON.stringify({
@@ -11,12 +18,7 @@ export function createResponse(status: number, message?: string, data?: any) {
             ...(data ? { data } : null),
         }),
         {
-            headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": ORIGIN_URL ?? "*",
-                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            },
+            headers: headers,
             status,
         }
     );
@@ -30,12 +32,7 @@ export function response(status: number, message?: string, data?: any) {
             ...(data ? { data } : null),
         }),
         {
-            headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": ORIGIN_URL ?? "*",
-                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
-            },
+            headers: headers,
             status,
         }
     );

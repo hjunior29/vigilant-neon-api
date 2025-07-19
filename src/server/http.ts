@@ -1,7 +1,7 @@
 import { ORIGIN_URL } from "$constants/index";
 import { auth } from "auth";
-import { createPubSub, deleteTopics, getSharedTopic, getTopicById, getTopics, shareTopic } from "pubsub";
-import { createResponse } from "utils";
+import { createTopic, deleteTopics, getSharedTopic, getTopicById, getTopics, shareTopic } from "pubsub";
+import {createResponse, headers} from "utils";
 
 export function httpServer() {
     const server = Bun.serve({
@@ -23,11 +23,7 @@ const cors = {
         OPTIONS: async () =>
             new Response(null, {
                 status: 204,
-                headers: {
-                    "Access-Control-Allow-Origin": ORIGIN_URL ?? "*",
-                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                },
+                headers: headers,
             }),
     },
 };
@@ -42,7 +38,7 @@ const login = {
 const pubsub = {
     "/api/pubsub": {
         POST: (req: Request) =>
-            createPubSub(req),
+            createTopic(req),
 
         GET: (req: Request) =>
             getTopics(req),

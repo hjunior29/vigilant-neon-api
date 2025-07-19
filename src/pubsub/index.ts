@@ -2,8 +2,9 @@ import { db } from "$core/index";
 import { publishers, subscribers, topics } from "$core/models";
 import {response, generateRandomString, verifyToken} from "utils";
 import { and, eq, isNull, inArray } from "drizzle-orm";
+import {realtimeUpdate} from "../server/websocket.ts";
 
-export async function createPubSub(req: Request) {
+export async function createTopic(req: Request) {
     const tokenResponse = await verifyToken(req.headers.get("Authorization"));
     if (tokenResponse instanceof Response) {
         return tokenResponse;
@@ -25,6 +26,8 @@ export async function createPubSub(req: Request) {
             subscriberId: subscriber[0].id
         })
         .returning();
+
+    realtimeUpdate("create");
 
     return response(200, "Pubsub created", topic);
 }
@@ -95,7 +98,9 @@ export async function deleteTopics(req: Request) {
         )
         .returning();
 
-    return response(200, "Topics deleted", null);
+    realtimeUpdate("delete");
+
+    return response(200, "Topics deleted");
 }
 
 export async function shareTopic(req: Request) {
@@ -123,6 +128,8 @@ export async function shareTopic(req: Request) {
         )
         .returning();
 
+    realtimeUpdate("share");
+
     return response(200, "Topic shared", { sharedId });
 }
 
@@ -144,4 +151,16 @@ export async function getSharedTopic(req: Request) {
         );
 
     return response(200, "Topic retrieved", result[0]);
+}
+
+export async function fetchAllTopics() {
+    const result = await db
+        .select()
+        .from(topics)
+        .where(
+            and(
+                isNull(topics.deletedAt),
+            )
+        );
+    return result;
 }
