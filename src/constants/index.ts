@@ -1,5 +1,7 @@
 import { importPKCS8, importSPKI } from "jose";
 
+export const PORT = Bun.env.PORT;
+
 export const DATABASE_HOST = Bun.env.DATABASE_HOST;
 export const DATABASE_USER = Bun.env.DATABASE_USER;
 export const DATABASE_PASS = Bun.env.DATABASE_PASS;

@@ -1,7 +1,8 @@
-import { checkDB, migrateDB, seed } from "$core/index";
-import { httpServer } from "server/http";
-import {websocketServer, wsServer} from "server/websocket";
-import {channelWsServer} from "./src/server/channel.ts";
+import {checkDB, migrateDB, seed} from "$core/index";
+import {httpHandler} from "server/http";
+import {websocketFetch, websocketHandler} from "server/websocket";
+import {setServer} from "./src/server/instance.ts";
+import {PORT} from "$constants/index.ts";
 
 async function bootstrap() {
     console.log("🚀 Starting application...");
@@ -20,8 +21,18 @@ async function bootstrap() {
         }
 
         await seed();
-        httpServer();
-        websocketServer();
+
+        const app = Bun.serve<{ type: "topic" | "realtime"; id: string }, {}>({
+            port: PORT,
+            routes: httpHandler,
+            fetch: websocketFetch,
+            websocket: websocketHandler(),
+        });
+
+        setServer(app);
+
+        console.log(`✅ Application started successfully on port ${app.port}`);
+
     } catch (error) {
         console.error("❌ Critical error during startup:", error);
         process.exit(1);

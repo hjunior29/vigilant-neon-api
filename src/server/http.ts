@@ -1,22 +1,6 @@
-import { ORIGIN_URL } from "$constants/index";
 import { auth } from "auth";
 import { createTopic, deleteTopics, getSharedTopic, getTopicById, getTopics, shareTopic } from "pubsub";
 import {createResponse, headers} from "utils";
-
-export function httpServer() {
-    const server = Bun.serve({
-        routes: {
-            ...cors,
-            ...login,
-            ...pubsub,
-            ...ping
-        }
-    })
-
-    console.log(`🚀 Server running at http://${server.hostname}:${server.port}`);
-
-    return server;
-}
 
 const cors = {
     "/*": {
@@ -68,4 +52,11 @@ const ping = {
         GET: async () =>
             createResponse(200, "pong"),
     }
+}
+
+export const httpHandler = {
+    ...cors,
+    ...login,
+    ...pubsub,
+    ...ping
 }

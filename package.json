@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.10",
     "@types/bun": "latest",
     "@types/pg": "^8.11.11",
     "drizzle-kit": "^0.30.6"
