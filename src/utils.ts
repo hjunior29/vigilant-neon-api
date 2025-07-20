@@ -1,27 +1,14 @@
-import { jwtVerify } from "jose";
-import { ORIGIN_URL, PUBLIC_KEY } from "./constants";
+import {jwtVerify} from "jose";
+import {ORIGIN_URL, PUBLIC_KEY} from "./constants";
 import {db} from "$core/index.ts";
-import {sql} from "drizzle-orm";
+import {and, eq, isNull, sql} from "drizzle-orm";
+import {users} from "$core/models.ts";
 
 export const headers = {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": ORIGIN_URL ?? "*",
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization"
-}
-
-export function createResponse(status: number, message?: string, data?: any) {
-    return new Response(
-        JSON.stringify({
-            status,
-            ...(message ? { message } : null),
-            ...(data ? { data } : null),
-        }),
-        {
-            headers: headers,
-            status,
-        }
-    );
 }
 
 export function response(status: number, message?: string, data?: any) {
@@ -39,28 +26,43 @@ export function response(status: number, message?: string, data?: any) {
 }
 
 export async function hashPassword(password: string): Promise<string> {
-    const hash = await Bun.password.hash(password, {
+    return await Bun.password.hash(password, {
         algorithm: "bcrypt",
         cost: 4,
     });
-    return hash;
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-    const isMatch = await Bun.password.verify(password, hash);
-    return isMatch;
+    return await Bun.password.verify(password, hash);
 }
 
 export async function verifyToken(token: string | null) {
     if (!token) {
-        return createResponse(401, "Unauthorized");
+        return response(401, "Unauthorized");
     }
 
     if (token.startsWith("Bearer ")) {
         token = token.slice(7);
         if (!token) {
-            return createResponse(401, "Unauthorized");
+            return response(401, "Unauthorized");
         }
+    } else if (token.startsWith("vine_")) {
+        const result = await db
+            .select()
+            .from(users)
+            .where(
+                and(
+                    eq(users.apiKey, token),
+                    isNull(users.deletedAt)
+                )
+            );
+        if (result.length === 0) {
+            return response(401, "Invalid API key");
+        }
+        // If the token is an API key, we don't need to verify it with JWT
+        return;
+    } else {
+        return response(401, "Invalid token format");
     }
 
     try {
@@ -69,7 +71,7 @@ export async function verifyToken(token: string | null) {
         });
         return
     } catch {
-        return createResponse(401, "Invalid token");
+        return response(401, "Invalid token");
     }
 }
 

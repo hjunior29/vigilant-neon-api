@@ -12,7 +12,8 @@ const defaultModel = {
 export const users = p.pgTable("users", {
     ...defaultModel,
     username: p.text(),
-    hashedPassword: p.text()
+    hashedPassword: p.text(),
+    apiKey: p.text(),
 });
 
 export const publishers = p.pgTable("publishers", {

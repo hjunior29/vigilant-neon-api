@@ -1,6 +1,6 @@
-import { auth } from "auth";
-import { createTopic, deleteTopics, getSharedTopic, getTopicById, getTopics, shareTopic } from "pubsub";
-import {createResponse, headers} from "utils";
+import {createApiKey, deleteApiKey, getApiKeys, login} from "auth";
+import {createTopic, deleteTopics, getSharedTopic, getTopicById, getTopics, shareTopic} from "pubsub";
+import {headers, response} from "utils";
 
 const cors = {
     "/*": {
@@ -12,10 +12,24 @@ const cors = {
     },
 };
 
-const login = {
+const auth = {
     "/api/auth/login": {
         POST: async (req: Request) =>
-            auth(req)
+            login(req)
+    },
+
+    "/api/auth/apikey": {
+        POST: async (req: Request) =>
+            createApiKey(req),
+
+        GET: async (req: Request) =>
+            getApiKeys(req)
+    },
+
+    "/api/auth/apikey/:id": {
+        DELETE: async (req: Request) =>
+            deleteApiKey(req)
+
     }
 }
 
@@ -50,13 +64,13 @@ const pubsub = {
 const ping = {
     "/api/ping": {
         GET: async () =>
-            createResponse(200, "pong"),
+            response(200, "pong"),
     }
 }
 
 export const httpHandler = {
     ...cors,
-    ...login,
+    ...auth,
     ...pubsub,
     ...ping
 }
