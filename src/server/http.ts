@@ -12,6 +12,17 @@ const cors = {
     },
 };
 
+const home = {
+    "/": {
+        GET: async () =>
+            response(200, "API from Vigilant Neon Project", {
+                name: "Vigilant Neon API",
+                description: "Real‑time Pub/Sub topic management with REST & WebSocket powered by Bun + TypeScript + Svelte.",
+                author: "github.com/hjunior29",
+            }),
+    }
+}
+
 const auth = {
     "/api/auth/login": {
         POST: async (req: Request) =>
@@ -69,6 +80,7 @@ const ping = {
 }
 
 export const httpHandler = {
+    ...home,
     ...cors,
     ...auth,
     ...pubsub,
