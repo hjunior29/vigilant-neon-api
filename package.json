@@ -3,6 +3,10 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "test": "bun test",
+    "dev": "bun run --watch index.ts"
+  },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.7.10",
     "@types/bun": "latest",
