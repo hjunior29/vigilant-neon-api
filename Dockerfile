@@ -1,10 +1,14 @@
 # syntax = docker/dockerfile:1
 
 # Adjust BUN_VERSION as desired
-ARG BUN_VERSION=1.2.4
+ARG BUN_VERSION=1.4.2
 FROM oven/bun:${BUN_VERSION}-slim AS base
 
 LABEL fly_launch_runtime="Bun"
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y sqlite3 ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # Bun app lives here
 WORKDIR /app

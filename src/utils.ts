@@ -2,7 +2,7 @@ import {jwtVerify} from "jose";
 import {ORIGIN_URL, PUBLIC_KEY} from "./constants";
 import {db} from "$core/index.ts";
 import {and, eq, isNull, sql} from "drizzle-orm";
-import {users} from "$core/models.ts";
+import {users, topics} from "$core/models.ts";
 
 export const headers = {
     "Content-Type": "application/json",
@@ -86,14 +86,11 @@ export function generateRandomString(length: number): string {
 }
 
 export async function appendMessage(topicId: string, msg: string | object) {
-    await db.execute(sql`
-        UPDATE topics
-        SET content = jsonb_set(
-            coalesce(content, '{}'::jsonb),
-            '{messages}',
-            coalesce(content->'messages', '[]'::jsonb)
-                 || ${JSON.stringify(msg)}::jsonb
-        )
-        WHERE id = ${topicId};
-    `);
+    const topic = await db.select().from(topics).where(eq(topics.id, topicId)).limit(1);
+    if (!topic || topic.length === 0) return;
+    const current = (topic[0].content as any) || {};
+    const messages = Array.isArray(current.messages) ? current.messages : [];
+    messages.push(msg);
+    current.messages = messages;
+    await db.update(topics).set({ content: current }).where(eq(topics.id, topicId));
 }

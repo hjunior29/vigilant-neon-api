@@ -1,35 +1,43 @@
 
 import { sql } from "drizzle-orm";
-import * as p from "drizzle-orm/pg-core"
+import * as p from "drizzle-orm/sqlite-core";
 
 const defaultModel = {
-    id: p.uuid("id").default(sql`gen_random_uuid()`).primaryKey(),
-    createdAt: p.timestamp().defaultNow().notNull(),
-    updatedAt: p.timestamp().defaultNow().$onUpdate(() => new Date()).notNull(),
-    deletedAt: p.timestamp(),
-}
+    id: p.text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    createdAt: p
+        .integer({ mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
+    updatedAt: p
+        .integer({ mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`)
+        .$onUpdate(() => new Date()),
+    deletedAt: p.integer({ mode: "timestamp" }),
+};
 
-export const users = p.pgTable("users", {
+export const users = p.sqliteTable("users", {
     ...defaultModel,
     username: p.text(),
     hashedPassword: p.text(),
     apiKey: p.text(),
 });
 
-export const publishers = p.pgTable("publishers", {
+export const publishers = p.sqliteTable("publishers", {
     ...defaultModel,
     name: p.text(),
 });
 
-export const subscribers = p.pgTable("subscribers", {
+export const subscribers = p.sqliteTable("subscribers", {
     ...defaultModel,
     name: p.text(),
 });
 
-export const topics = p.pgTable("topics", {
+export const topics = p.sqliteTable("topics", {
     ...defaultModel,
     publisherId: p.text(),
     subscriberId: p.text(),
-    content: p.jsonb(),
+    content: p.text({ mode: "json" }),
     sharedId: p.text(),
 });
+

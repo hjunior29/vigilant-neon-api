@@ -1,15 +1,20 @@
 import { DATABASE_URL, PASSWORD, USERNAME } from "$constants/index";
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { Database } from "bun:sqlite";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import * as schema from "./models";
 import { users } from "./models";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "utils";
 
-export const db = drizzle(DATABASE_URL);
+const sqlite = new Database(DATABASE_URL);
+sqlite.run("PRAGMA journal_mode = WAL;");
+
+export const db = drizzle(sqlite, { schema });
 
 export async function checkDB() {
     try {
-        await db.execute('select 1');
+        sqlite.query("SELECT 1;").get();
         console.log("✅ Database connection verified");
         return true;
     } catch (error) {
@@ -20,7 +25,7 @@ export async function checkDB() {
 
 export async function migrateDB() {
     try {
-        await migrate(db, { migrationsFolder: "./drizzle" });
+        migrate(db, { migrationsFolder: "./drizzle" });
         console.log("✅ Database migration successful");
         return true;
     } catch (error) {
